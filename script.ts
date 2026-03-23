@@ -69,7 +69,6 @@ const CITIES = ['Москва', 'Санкт-Петербург', 'Казань',
 
 const ADMIN_PHONES = ['+7 999 999 99 99', '+7 123 456 78 90', '79999999999', '71234567890']
 
-// ===== STATE =====
 let selectedCity: string = localStorage.getItem('selectedCity') || ''
 let activeCategory: string | null = null
 
@@ -223,7 +222,7 @@ logContainer.appendChild(helpButton)
 helpButton.appendChild(helpPhoto)
 helpButton.onclick = () => HelpWindow()
 
-// ===== ASIDE (categories) =====
+// ===== ASIDE =====
 const aside = document.createElement('aside')
 document.body.append(aside)
 
@@ -351,7 +350,6 @@ function renderMain() {
 
 renderMain()
 
-// Redirect wheel scroll from anywhere on page into main
 document.addEventListener('wheel', (e) => {
     const target = e.target as HTMLElement
     if (target.closest('.log-form, .help-window, .city-popup, .second-aside')) return
@@ -359,7 +357,7 @@ document.addEventListener('wheel', (e) => {
     main.scrollTop += e.deltaY
 }, { passive: false })
 
-// ===== SECOND ASIDE (cart + city) =====
+// ===== SECOND ASIDE =====
 const secondAside = document.createElement('div')
 secondAside.className = 'second-aside'
 document.body.append(secondAside)
@@ -367,7 +365,6 @@ document.body.append(secondAside)
 function renderSecondAside() {
     secondAside.innerHTML = ''
 
-    // City block
     const cityBlock = document.createElement('div')
     cityBlock.className = 'city-block'
 
@@ -398,7 +395,6 @@ function renderSecondAside() {
 
     secondAside.appendChild(cityBlock)
 
-    // Cart block
     const cart = getCart()
     const cartBlock = document.createElement('div')
     cartBlock.className = 'cart-block'
@@ -757,14 +753,12 @@ function createProductPopup(product: Product) {
     const body = document.createElement('div')
     body.className = 'product-popup-body'
 
-    // Image
     const img = document.createElement('img')
     img.src = product.image
     img.className = 'product-popup-img'
     img.alt = product.name
     body.appendChild(img)
 
-    // Name + description
     const nameEl = document.createElement('h2')
     nameEl.className = 'product-popup-name'
     nameEl.innerText = product.name
@@ -775,7 +769,6 @@ function createProductPopup(product: Product) {
     descEl.innerText = product.description
     body.appendChild(descEl)
 
-    // Nutrition (per 100g)
     if (product.kcal !== undefined) {
         const nutTitle = document.createElement('p')
         nutTitle.className = 'product-popup-section-label'
@@ -807,7 +800,6 @@ function createProductPopup(product: Product) {
         body.appendChild(nutGrid)
     }
 
-    // Info rows
     const infoRows: [string, string | undefined][] = [
         ['Состав', product.compound],
         ['Срок хранения', product.expiry],
@@ -832,7 +824,6 @@ function createProductPopup(product: Product) {
 
     popup.appendChild(body)
 
-    // Bottom buy button
     const buyBtn = document.createElement('button')
     buyBtn.className = 'product-popup-buy-btn'
     buyBtn.innerHTML = `${product.price} ₽ &nbsp;+`
@@ -863,7 +854,6 @@ function RenderAdminPage() {
     allContent.className = 'all-admin-content'
     document.body.appendChild(allContent)
 
-    // --- ADD CONTAINER ---
     const h1Add = document.createElement('h1')
     h1Add.innerText = 'Добавить товар'
     const addContainer = document.createElement('div')
@@ -984,7 +974,6 @@ function RenderAdminPage() {
     addContainer.appendChild(addFeedback)
     addContainer.appendChild(submitBtn)
 
-    // --- DELETE CONTAINER ---
     const h1Del = document.createElement('h1')
     h1Del.innerText = 'Удалить товар'
     const delContainer = document.createElement('div')
