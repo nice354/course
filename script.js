@@ -41,7 +41,6 @@
     }
     const CITIES = ['Москва', 'Санкт-Петербург', 'Казань', 'Новосибирск', 'Екатеринбург', 'Нижний Новгород', 'Самара', 'Омск', 'Челябинск', 'Ростов-на-Дону'];
     const ADMIN_PHONES = ['+7 999 999 99 99', '+7 123 456 78 90', '79999999999', '71234567890'];
-    // ===== STATE =====
     let selectedCity = localStorage.getItem('selectedCity') || '';
     let activeCategory = null;
     // ===== CART =====
@@ -149,6 +148,28 @@
     searchInput.type = 'text';
     searchInput.className = 'search';
     searchInput.placeholder = 'Искать в Везет';
+    let searchQuery = '';
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const query = searchInput.value.trim().toLowerCase();
+            const found = getProducts().some(p => p.name.toLowerCase().includes(query));
+            if (query && !found) {
+                alert(`Товар "${searchInput.value.trim()}" не найден`);
+                searchInput.value = '';
+                searchQuery = '';
+                renderMain();
+                return;
+            }
+            searchQuery = query;
+            renderMain();
+        }
+    });
+    searchInput.addEventListener('input', () => {
+        if (searchInput.value === '') {
+            searchQuery = '';
+            renderMain();
+        }
+    });
     logContainer.className = 'log-container';
     helpButton.className = 'help-button';
     logInPhoto.src = 'img/login-user-photo.svg';
@@ -178,7 +199,7 @@
     logContainer.appendChild(helpButton);
     helpButton.appendChild(helpPhoto);
     helpButton.onclick = () => HelpWindow();
-    // ===== ASIDE (categories) =====
+    // ===== ASIDE =====
     const aside = document.createElement('aside');
     document.body.append(aside);
     const categories = [
@@ -204,6 +225,8 @@
             li.appendChild(label);
             li.onclick = () => {
                 activeCategory = activeCategory === cat.key ? null : cat.key;
+                searchQuery = '';
+                searchInput.value = '';
                 renderAside();
                 renderMain();
             };
@@ -219,9 +242,11 @@
         var _a;
         main.innerHTML = '';
         const allProducts = getProducts();
-        const filtered = activeCategory
-            ? allProducts.filter(p => p.category === activeCategory)
-            : allProducts;
+        const filtered = allProducts.filter(p => {
+            const matchesCategory = activeCategory ? p.category === activeCategory : true;
+            const matchesSearch = searchQuery ? p.name.toLowerCase().includes(searchQuery) : true;
+            return matchesCategory && matchesSearch;
+        });
         if (activeCategory) {
             const breadcrumb = document.createElement('p');
             breadcrumb.className = 'breadcrumb';
@@ -289,7 +314,6 @@
         renderFooter();
     }
     renderMain();
-    // Redirect wheel scroll from anywhere on page into main
     document.addEventListener('wheel', (e) => {
         const target = e.target;
         if (target.closest('.log-form, .help-window, .city-popup, .second-aside'))
@@ -297,13 +321,12 @@
         e.preventDefault();
         main.scrollTop += e.deltaY;
     }, { passive: false });
-    // ===== SECOND ASIDE (cart + city) =====
+    // ===== SECOND ASIDE =====
     const secondAside = document.createElement('div');
     secondAside.className = 'second-aside';
     document.body.append(secondAside);
     function renderSecondAside() {
         secondAside.innerHTML = '';
-        // City block
         const cityBlock = document.createElement('div');
         cityBlock.className = 'city-block';
         const cityBtn = document.createElement('button');
@@ -330,7 +353,6 @@
             cityBlock.appendChild(deliveryNote);
         }
         secondAside.appendChild(cityBlock);
-        // Cart block
         const cart = getCart();
         const cartBlock = document.createElement('div');
         cartBlock.className = 'cart-block';
@@ -348,6 +370,12 @@
             cart.forEach(item => {
                 const row = document.createElement('div');
                 row.className = 'cart-row';
+                const rowImg = document.createElement('img');
+                rowImg.src = item.product.image;
+                rowImg.className = 'cart-row-img';
+                rowImg.alt = item.product.name;
+                rowImg.style.cursor = 'pointer';
+                rowImg.onclick = () => ProductPopup(item.product);
                 const rowName = document.createElement('span');
                 rowName.className = 'cart-row-name';
                 rowName.innerText = item.product.name;
@@ -361,6 +389,7 @@
                 removeBtn.className = 'cart-remove-btn';
                 removeBtn.innerText = '✕';
                 removeBtn.onclick = () => removeFromCart(item.product.id);
+                row.appendChild(rowImg);
                 row.appendChild(rowName);
                 row.appendChild(rowQty);
                 row.appendChild(rowPrice);
@@ -640,13 +669,11 @@
         popup.appendChild(closeDiv);
         const body = document.createElement('div');
         body.className = 'product-popup-body';
-        // Image
         const img = document.createElement('img');
         img.src = product.image;
         img.className = 'product-popup-img';
         img.alt = product.name;
         body.appendChild(img);
-        // Name + description
         const nameEl = document.createElement('h2');
         nameEl.className = 'product-popup-name';
         nameEl.innerText = product.name;
@@ -655,7 +682,6 @@
         descEl.className = 'product-popup-desc';
         descEl.innerText = product.description;
         body.appendChild(descEl);
-        // Nutrition (per 100g)
         if (product.kcal !== undefined) {
             const nutTitle = document.createElement('p');
             nutTitle.className = 'product-popup-section-label';
@@ -685,7 +711,6 @@
             });
             body.appendChild(nutGrid);
         }
-        // Info rows
         const infoRows = [
             ['Состав', product.compound],
             ['Срок хранения', product.expiry],
@@ -709,7 +734,6 @@
             body.appendChild(row);
         });
         popup.appendChild(body);
-        // Bottom buy button
         const buyBtn = document.createElement('button');
         buyBtn.className = 'product-popup-buy-btn';
         buyBtn.innerHTML = `${product.price} ₽ &nbsp;+`;
@@ -735,7 +759,6 @@
         const allContent = document.createElement('div');
         allContent.className = 'all-admin-content';
         document.body.appendChild(allContent);
-        // --- ADD CONTAINER ---
         const h1Add = document.createElement('h1');
         h1Add.innerText = 'Добавить товар';
         const addContainer = document.createElement('div');
@@ -832,21 +855,7 @@
                 doAdd(name, volume, price, category, imageData);
             }
             function doAdd(n, v, p, c, img) {
-                const newProduct = {
-                    id: getNextProductId(),
-                    name: n,
-                    description: v,
-                    price: p,
-                    category: c,
-                    image: img,
-                    kcal: parseFloat(inputKcal.value) || undefined,
-                    carbo: parseFloat(inputCarbo.value) || undefined,
-                    compound: inputComp.value.trim() || undefined,
-                    expiry: inputDate.value || undefined,
-                    producer: inputProducer.value.trim() || undefined,
-                    brand: inputBrand.value.trim() || undefined,
-                    productType: select.value || undefined,
-                };
+                const newProduct = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ id: getNextProductId(), name: n, description: v, price: p, category: c, image: img }, (parseFloat(inputKcal.value) ? { kcal: parseFloat(inputKcal.value) } : {})), (parseFloat(inputCarbo.value) ? { carbo: parseFloat(inputCarbo.value) } : {})), (inputComp.value.trim() ? { compound: inputComp.value.trim() } : {})), (inputDate.value ? { expiry: inputDate.value } : {})), (inputProducer.value.trim() ? { producer: inputProducer.value.trim() } : {})), (inputBrand.value.trim() ? { brand: inputBrand.value.trim() } : {})), (select.value ? { productType: select.value } : {}));
                 const products = getProducts();
                 products.push(newProduct);
                 saveProducts(products);
@@ -875,7 +884,6 @@
         addContainer.appendChild(inputImg);
         addContainer.appendChild(addFeedback);
         addContainer.appendChild(submitBtn);
-        // --- DELETE CONTAINER ---
         const h1Del = document.createElement('h1');
         h1Del.innerText = 'Удалить товар';
         const delContainer = document.createElement('div');
@@ -898,6 +906,7 @@
         delBtn.className = 'delete-button';
         delBtn.innerText = 'Удалить';
         delBtn.onclick = () => {
+            var _a;
             const name = delInputName.value.trim().toLowerCase();
             const volume = delInputVolume.value.trim().toLowerCase();
             if (!name) {
@@ -917,7 +926,7 @@
                 const removed = products[idx];
                 products.splice(idx, 1);
                 saveProducts(products);
-                showFeedback(delFeedback, `Товар "${removed.name}" удалён`, false);
+                showFeedback(delFeedback, `Товар "${(_a = removed === null || removed === void 0 ? void 0 : removed.name) !== null && _a !== void 0 ? _a : ''}" удалён`, false);
                 delInputName.value = '';
                 delInputProducer.value = '';
                 delInputBrand.value = '';
@@ -941,3 +950,4 @@
         setTimeout(() => { el.innerText = ''; }, 3000);
     }
 })();
+//# sourceMappingURL=script.js.map

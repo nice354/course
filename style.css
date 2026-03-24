@@ -355,10 +355,18 @@ main::-webkit-scrollbar {
 
 .cart-row {
     display: grid;
-    grid-template-columns: 1fr auto auto auto;
+    grid-template-columns: 28px 1fr auto auto auto;
     align-items: center;
     gap: 6px;
     font-size: 12px;
+}
+
+.cart-row-img {
+    width: 28px;
+    height: 28px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
 }
 
 .cart-row-name {

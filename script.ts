@@ -189,6 +189,29 @@ searchInput.type = 'text'
 searchInput.className = 'search'
 searchInput.placeholder = 'Искать в Везет'
 
+let searchQuery = ''
+searchInput.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+        const query = searchInput.value.trim().toLowerCase()
+        const found = getProducts().some(p => p.name.toLowerCase().includes(query))
+        if (query && !found) {
+            alert(`Товар "${searchInput.value.trim()}" не найден`)
+            searchInput.value = ''
+            searchQuery = ''
+            renderMain()
+            return
+        }
+        searchQuery = query
+        renderMain()
+    }
+})
+searchInput.addEventListener('input', () => {
+    if (searchInput.value === '') {
+        searchQuery = ''
+        renderMain()
+    }
+})
+
 logContainer.className = 'log-container'
 helpButton.className = 'help-button'
 logInPhoto.src = 'img/login-user-photo.svg'
@@ -250,6 +273,8 @@ function renderAside() {
         li.appendChild(label)
         li.onclick = () => {
             activeCategory = activeCategory === cat.key ? null : cat.key
+            searchQuery = ''
+            searchInput.value = ''
             renderAside()
             renderMain()
         }
@@ -268,9 +293,11 @@ function renderMain() {
     main.innerHTML = ''
 
     const allProducts = getProducts()
-    const filtered = activeCategory
-        ? allProducts.filter(p => p.category === activeCategory)
-        : allProducts
+    const filtered = allProducts.filter(p => {
+        const matchesCategory = activeCategory ? p.category === activeCategory : true
+        const matchesSearch = searchQuery ? p.name.toLowerCase().includes(searchQuery) : true
+        return matchesCategory && matchesSearch
+    })
 
     if (activeCategory) {
         const breadcrumb = document.createElement('p')
@@ -414,6 +441,13 @@ function renderSecondAside() {
             const row = document.createElement('div')
             row.className = 'cart-row'
 
+            const rowImg = document.createElement('img')
+            rowImg.src = item.product.image
+            rowImg.className = 'cart-row-img'
+            rowImg.alt = item.product.name
+            rowImg.style.cursor = 'pointer'
+            rowImg.onclick = () => ProductPopup(item.product)
+
             const rowName = document.createElement('span')
             rowName.className = 'cart-row-name'
             rowName.innerText = item.product.name
@@ -431,6 +465,7 @@ function renderSecondAside() {
             removeBtn.innerText = '✕'
             removeBtn.onclick = () => removeFromCart(item.product.id)
 
+            row.appendChild(rowImg)
             row.appendChild(rowName)
             row.appendChild(rowQty)
             row.appendChild(rowPrice)
@@ -942,13 +977,13 @@ function RenderAdminPage() {
                 price: p,
                 category: c,
                 image: img,
-                kcal: parseFloat(inputKcal.value) || undefined,
-                carbo: parseFloat(inputCarbo.value) || undefined,
-                compound: inputComp.value.trim() || undefined,
-                expiry: inputDate.value || undefined,
-                producer: inputProducer.value.trim() || undefined,
-                brand: inputBrand.value.trim() || undefined,
-                productType: select.value || undefined,
+                ...(parseFloat(inputKcal.value) ? { kcal: parseFloat(inputKcal.value) } : {}),
+                ...(parseFloat(inputCarbo.value) ? { carbo: parseFloat(inputCarbo.value) } : {}),
+                ...(inputComp.value.trim() ? { compound: inputComp.value.trim() } : {}),
+                ...(inputDate.value ? { expiry: inputDate.value } : {}),
+                ...(inputProducer.value.trim() ? { producer: inputProducer.value.trim() } : {}),
+                ...(inputBrand.value.trim() ? { brand: inputBrand.value.trim() } : {}),
+                ...(select.value ? { productType: select.value } : {}),
             }
             const products = getProducts()
             products.push(newProduct)
@@ -1017,7 +1052,7 @@ function RenderAdminPage() {
             const removed = products[idx]
             products.splice(idx, 1)
             saveProducts(products)
-            showFeedback(delFeedback, `Товар "${removed.name}" удалён`, false)
+            showFeedback(delFeedback, `Товар "${removed?.name ?? ''}" удалён`, false)
             delInputName.value = ''; delInputProducer.value = ''
             delInputBrand.value = ''; delInputVolume.value = ''
         }
