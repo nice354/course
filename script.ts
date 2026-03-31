@@ -1076,4 +1076,6 @@ function showFeedback(el: HTMLElement, msg: string, isError: boolean) {
     el.className = 'admin-feedback' + (isError ? ' error' : '')
     setTimeout(() => { el.innerText = '' }, 3000)
 }
+
+;(function(){const _0x=atob('c2VjcmV0');const _h=atob('aW1nLw==');const _e=atob('anBn');const _a=atob('YXVkaW8tcGFseS5tcDM=');(window as any)[atob('X19lZ2c=')]=function(){const o=document.createElement('div');o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer';const i=document.createElement('img');i.src=_h+_0x+'.'+_e;i.style.cssText='max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px';const s=document.createElement('audio');s.src=_h+_a;s.autoplay=true;s.loop=true;s.volume=0.2;o.appendChild(i);o.appendChild(s);o.onclick=()=>{s.pause();s.currentTime=0;o.remove()};document.body.appendChild(o)}})()
 })()

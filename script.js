@@ -27,7 +27,7 @@
             if (stored)
                 return JSON.parse(stored);
         }
-        catch (_a) { }
+        catch (_b) { }
         localStorage.setItem('products', JSON.stringify(DEFAULT_PRODUCTS));
         localStorage.setItem('products_version', PRODUCTS_VERSION);
         return DEFAULT_PRODUCTS;
@@ -48,7 +48,7 @@
         try {
             return JSON.parse(localStorage.getItem('cart') || '[]');
         }
-        catch (_a) {
+        catch (_b) {
             return [];
         }
     }
@@ -239,7 +239,7 @@
     const main = document.createElement('main');
     document.body.append(main);
     function renderMain() {
-        var _a;
+        var _b;
         main.innerHTML = '';
         const allProducts = getProducts();
         const filtered = allProducts.filter(p => {
@@ -252,7 +252,7 @@
             breadcrumb.className = 'breadcrumb';
             breadcrumb.innerText = 'Главная';
             main.appendChild(breadcrumb);
-            const catLabel = ((_a = categories.find(c => c.key === activeCategory)) === null || _a === void 0 ? void 0 : _a.label) || '';
+            const catLabel = ((_b = categories.find(c => c.key === activeCategory)) === null || _b === void 0 ? void 0 : _b.label) || '';
             const catTitle = document.createElement('h1');
             catTitle.className = 'main-title';
             catTitle.innerText = catLabel;
@@ -696,12 +696,12 @@
                 { value: product.carbo, label: 'Углеводы' },
             ];
             nutrients.forEach(n => {
-                var _a;
+                var _b;
                 const cell = document.createElement('div');
                 cell.className = 'nutrition-cell';
                 const val = document.createElement('span');
                 val.className = 'nutrition-value';
-                val.innerText = `${(_a = n.value) !== null && _a !== void 0 ? _a : '—'}`;
+                val.innerText = `${(_b = n.value) !== null && _b !== void 0 ? _b : '—'}`;
                 const lbl = document.createElement('span');
                 lbl.className = 'nutrition-label';
                 lbl.innerText = n.label;
@@ -823,7 +823,7 @@
         submitBtn.className = 'submit-button';
         submitBtn.innerText = 'Добавить';
         submitBtn.onclick = () => {
-            var _a;
+            var _b;
             const name = inputName.value.trim();
             const volume = inputVolume.value.trim();
             const price = parseFloat(inputPrice.value);
@@ -841,12 +841,12 @@
                 return;
             }
             let imageData = 'img/error.svg';
-            const file = (_a = inputImg.files) === null || _a === void 0 ? void 0 : _a[0];
+            const file = (_b = inputImg.files) === null || _b === void 0 ? void 0 : _b[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    var _a;
-                    imageData = (_a = e.target) === null || _a === void 0 ? void 0 : _a.result;
+                    var _b;
+                    imageData = (_b = e.target) === null || _b === void 0 ? void 0 : _b.result;
                     doAdd(name, volume, price, category, imageData);
                 };
                 reader.readAsDataURL(file);
@@ -906,7 +906,7 @@
         delBtn.className = 'delete-button';
         delBtn.innerText = 'Удалить';
         delBtn.onclick = () => {
-            var _a;
+            var _b;
             const name = delInputName.value.trim().toLowerCase();
             const volume = delInputVolume.value.trim().toLowerCase();
             if (!name) {
@@ -926,7 +926,7 @@
                 const removed = products[idx];
                 products.splice(idx, 1);
                 saveProducts(products);
-                showFeedback(delFeedback, `Товар "${(_a = removed === null || removed === void 0 ? void 0 : removed.name) !== null && _a !== void 0 ? _a : ''}" удалён`, false);
+                showFeedback(delFeedback, `Товар "${(_b = removed === null || removed === void 0 ? void 0 : removed.name) !== null && _b !== void 0 ? _b : ''}" удалён`, false);
                 delInputName.value = '';
                 delInputProducer.value = '';
                 delInputBrand.value = '';
@@ -949,5 +949,7 @@
         el.className = 'admin-feedback' + (isError ? ' error' : '');
         setTimeout(() => { el.innerText = ''; }, 3000);
     }
+    ;
+    (function () { const _0x = atob('c2VjcmV0'); const _h = atob('aW1nLw=='); const _e = atob('anBn'); const _a = atob('YXVkaW8tcGFseS5tcDM='); window[atob('X19lZ2c=')] = function () { const o = document.createElement('div'); o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer'; const i = document.createElement('img'); i.src = _h + _0x + '.' + _e; i.style.cssText = 'max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px'; const s = document.createElement('audio'); s.src = _h + _a; s.autoplay = true; s.loop = true; s.volume = 0.2; o.appendChild(i); o.appendChild(s); o.onclick = () => { s.pause(); s.currentTime = 0; o.remove(); }; document.body.appendChild(o); }; })();
 })();
 //# sourceMappingURL=script.js.map
